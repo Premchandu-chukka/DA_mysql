@@ -1,8 +1,0 @@
-ATM-Project using basic python( operators, statements, variables, loops, functions, modules, datatypes)
-
-security---password
-         |
-         |
-     login--> deposit, withdraw, pin change, balance enquiry, mini statement
-
-

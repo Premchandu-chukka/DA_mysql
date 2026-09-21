@@ -1,0 +1,317 @@
+'''
+ER Diagram (Entity-Relationship Diagram)
+==========
+one to one
+----------
+One record in Table A is related to only one record in Table B, and one record in Table B is related to only one record in Table A.
+
+Example: Person ↔ Passport
+One person has one passport.
+
+one to many
+-----------
+One record in Table A can be related to many records in Table B.
+
+But each record in Table B is related to only one record in Table A.
+
+Example: Department → Employees
+One department can have many employees.
+
+many to one
+------------
+Many records in Table A are related to one record in Table B.
+
+It is essentially the opposite direction of One-to-Many.
+
+Example: Employees → Department
+Many employees can belong to one department.
+
+many to many
+------------
+Many records in Table A can be related to many records in Table B.
+
+Example: Students ↔ Courses
+One student can enroll in many courses
+
+
+set operators
+=============
+Union
+---------
+combine results from two queries and removes duplicate rows. columns must have same number and type.
+
+Union All
+----------
+combines results from two queries and include all rows. including duplicates. columns must have same number and type. 
+
+Intersect
+----------
+returns rows that are common to both queries. columns must have the same number and type.
+note: MySQL doesn't support intersect directly.
+
+Minus/Except
+------------
+returns rows from the first query that are not present in the second query. columns must have same number and type.
+
+
+joins
+=====
+a join in MySql is used to combine rows from two or more tables based on related columns.
+
+example
+-------
+employees table--> employees details
+department table--> department details
+
+if you want to see which employee belongs to which department. you need to join these two tables.
+
+why do we need joins
+--------------------
+1. to fetch data from multiple tables in a single query
+2. to reduce data duplication(instead of keeping everything in one table).
+3. to implement relationships like(one-to-one, one-to-many, many-to-one, many-to-many).
+4. to generate reports and analytics combining different datasets.
+
+types of joins
+===============
+
+table-1
+========
+mysql> select * from tab_1;
++--------+
+| num_id |
++--------+
+|     10 |
+|     20 |
+|     30 |
+|     40 |
+|     90 |
+|    100 |
++--------+
+
+table-2
+=======
+mysql> select * from tab_2;
++--------+
+| num_id |
++--------+
+|     10 |
+|     20 |
+|     30 |
+|     40 |
+|     50 |
+|     60 |
+|     70 |
+|     80 |
++--------+
+
+Common column: num_id
+
+
+1. INNER JOIN
+=============
+
+Returns only the records that have matching values in both tables.
+
+Query:
+mysql> select * from tab_1
+    -> inner join tab_2
+    -> on tab_1.num_id=tab_2.num_id;
++--------+--------+
+| num_id | num_id |
++--------+--------+
+|     10 |     10 |
+|     20 |     20 |
+|     30 |     30 |
+|     40 |     40 |
++--------+--------+
+Remember:
+INNER JOIN = Matching records only
+
+
+2. LEFT JOIN
+============
+
+Returns all records from Table 1 (left table) and matching records from Table 2.
+If there is no match, NULL is returned for Table 2 columns.
+
+Query:
+mysql> select * from tab_1
+    -> left join tab_2
+    -> on tab_1.num_id=tab_2.num_id;
++--------+--------+
+| num_id | num_id |
++--------+--------+
+|     10 |     10 |
+|     20 |     20 |
+|     30 |     30 |
+|     40 |     40 |
+|     90 |   NULL |
+|    100 |   NULL |
++--------+--------+
+6 rows in set (0.00 sec)
+Remember:
+LEFT JOIN = Everything from Table 1 + matching data from Table 2
+
+
+3. RIGHT JOIN
+=============
+
+Returns all records from Table 2 (right table) and matching records from Table 1.
+If there is no match, NULL is returned for Table 1 columns.
+
+Query:
+mysql> select * from tab_1
+    -> right join tab_2
+    -> on tab_1.num_id=tab_2.num_id;
++--------+--------+
+| num_id | num_id |
++--------+--------+
+|     10 |     10 |
+|     20 |     20 |
+|     30 |     30 |
+|     40 |     40 |
+|   NULL |     50 |
+|   NULL |     60 |
+|   NULL |     70 |
+|   NULL |     80 |
++--------+--------+
+Remember:
+RIGHT JOIN = Everything from Table 2 + matching data from Table 1
+
+
+4. FULL JOIN
+==================
+
+Returns all records from both tables, including matching and non-matching records.
+
+Note:
+MySQL does not directly support FULL OUTER JOIN.
+
+It can be simulated using LEFT JOIN + RIGHT JOIN with UNION.
+
+Example:
+l> select * from tab_1
+    -> left join tab_2
+    -> on tab_1.num_id=tab_2.num_id
+    -> union
+    -> select * from tab_1
+    -> right join tab_2
+    -> on tab_1.num_id=tab_2.num_id;
++--------+--------+
+| num_id | num_id |
++--------+--------+
+|     10 |     10 |
+|     20 |     20 |
+|     30 |     30 |
+|     40 |     40 |
+|     90 |   NULL |
+|    100 |   NULL |
+|   NULL |     50 |
+|   NULL |     60 |
+|   NULL |     70 |
+|   NULL |     80 |
++--------+--------+
+
+
+5. CROSS JOIN
+=============
+
+Returns every possible combination of rows from both tables.
+
+If Table 1 has 5 rows and Table 2 has 5 rows:
+5 x 5 = 25 rows.
+
+Query:
+ select * from tab_1 cross join tab_2;
++--------+--------+
+| num_id | num_id |
++--------+--------+
+|    100 |     10 |
+|     90 |     10 |
+|     40 |     10 |
+|     30 |     10 |
+|     20 |     10 |
+|     10 |     10 |
+|    100 |     20 |
+|     90 |     20 |
+|     40 |     20 |
+|     30 |     20 |
+|     20 |     20 |
+|     10 |     20 |
+|    100 |     30 |
+|     90 |     30 |
+|     40 |     30 |
+|     30 |     30 |
+|     20 |     30 |
+|     10 |     30 |
+|    100 |     40 |
+|     90 |     40 |
+|     40 |     40 |
+|     30 |     40 |
+|     20 |     40 |
+|     10 |     40 |
+|    100 |     50 |
+|     90 |     50 |
+|     40 |     50 |
+|     30 |     50 |
+|     20 |     50 |
+|     10 |     50 |
+|    100 |     60 |
+|     90 |     60 |
+|     40 |     60 |
+|     30 |     60 |
+|     20 |     60 |
+|     10 |     60 |
+|    100 |     70 |
+|     90 |     70 |
+|     40 |     70 |
+|     30 |     70 |
+|     20 |     70 |
+|     10 |     70 |
+|    100 |     80 |
+|     90 |     80 |
+|     40 |     80 |
+|     30 |     80 |
+|     20 |     80 |
+|     10 |     80 |
++--------+--------+
+
+
+There is no ON condition.
+
+Remember:
+CROSS JOIN = Every possible combination
+
+
+6. SELF JOIN
+============
+
+A SELF JOIN means joining a table with itself.
+
+Example employees table:
+emp_id | emp_name | manager_id
+1      | Rahul    | NULL
+2      | Priya    | 1
+3      | Suresh   | 1
+4      | Anitha   | 2
+
+Query:
+SELECT e.emp_name AS employee,
+       m.emp_name AS manager
+FROM employees e
+LEFT JOIN employees m
+ON e.manager_id = m.emp_id;
+
+Result:
+employee | manager
+Rahul    | NULL
+Priya    | Rahul
+Suresh   | Rahul
+Anitha   | Priya
+
+Remember:
+SELF JOIN = A table joined with itself
+
+
+
